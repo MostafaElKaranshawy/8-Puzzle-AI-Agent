@@ -178,6 +178,8 @@ class PuzzleApp:
         self.prevButton['state'] = tk.DISABLED
         self.nextButton['state'] = tk.NORMAL
         self.detailsButton['state'] = tk.NORMAL
+        if self.currentStep == len(self.solution[0]) - 1:
+            self.nextButton['state'] = tk.DISABLED
 
     def updateGridDisplay(self):
         # solution = [path, pathDirections]

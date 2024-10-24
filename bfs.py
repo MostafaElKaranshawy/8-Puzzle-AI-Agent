@@ -15,102 +15,53 @@ class BFS:
         self.queue.put(self.startState)
         while (self.queue.qsize() > 0):
             currentState = self.queue.get()
-            print(currentState)
-            print(self.goalState)
-            print(currentState == self.goalState)
             if currentState == self.goalState:
                 return True
             if currentState in self.visited:
                 continue
             self.visited.add(currentState)
 
-            children = []
-            # Up Child Check and Add
-            upChild = self.getUpChild(currentState)
-            children.append(upChild)
+            children = self.getAllChildren(currentState)
+            children.sort()
 
-            # Left Child Check and Add
-            leftChild = self.getLeftChild(currentState)
-            children.append(leftChild)
-
-            # Down Child Check and Add
-            downChild = self.getDownChild(currentState)
-            children.append(downChild)
-
-            # Right Child Check and Add
-            rightChild = self.getRightChild(currentState)
-            children.append(rightChild)
-
-            children = sorted(children, key=lambda x: x[0])
             for child in children:
-                # child = [childNumber, childState]
-                if child[0] != -1 and child[1] not in self.visited and child[1] not in list(self.queue.queue):
-                    self.queue.put(child[1])
-                    self.parentMap[child[1]] = currentState
+                if child not in self.visited and child not in list(self.queue.queue):
+                    self.queue.put(child)
+                    self.parentMap[child] = currentState
+        return False
 
-    def getUpChild(self, state):
-        strState = str(state)
-        if (len(strState) < 9):
-            strState = "0" + strState
-        zeroIndex = strState.index('0')
-        if (zeroIndex < 3):
-            return [-1, -1]
-        else:
-            newState = strState
-            childNumber = int(newState[zeroIndex - 3])
-            stateList = list(newState)
-            stateList[zeroIndex] = stateList[zeroIndex - 3]
-            stateList[zeroIndex - 3] = '0'
-            newState = ''.join(stateList)
-            return [childNumber, int(newState)]
+    def getAllChildren(self, board):
+        str_board = str(board)
+        if len(str_board) < 9:
+            str_board = "0" + str_board
+        zero_index = str_board.index('0')
+        children = []
 
-    def getDownChild(self, state):
-        strState = str(state)
-        if (len(strState) < 9):
-            strState = "0" + strState
-        zeroIndex = strState.index('0')
-        if (zeroIndex > 5):
-            return [-1, -1]
-        else:
-            newState = strState
-            childNumber = int(newState[zeroIndex + 3])
-            stateList = list(newState)
-            stateList[zeroIndex] = stateList[zeroIndex + 3]
-            stateList[zeroIndex + 3] = '0'
-            newState = ''.join(stateList)
-            return [childNumber, int(newState)]
+        # Up Child
+        if zero_index >= 3:
+            new_board = list(str_board)
+            new_board[zero_index], new_board[zero_index - 3] = new_board[zero_index - 3], new_board[zero_index]
+            children.append( int(''.join(new_board)) )
 
-    def getLeftChild(self, state):
-        strState = str(state)
-        if (len(strState) < 9):
-            strState = "0" + strState
-        zeroIndex = strState.index('0')
-        if (zeroIndex % 3 == 0):  # 0, 3, 6
-            return [-1, -1]
-        else:
-            newState = strState
-            childNumber = int(newState[zeroIndex - 1])
-            stateList = list(newState)
-            stateList[zeroIndex] = stateList[zeroIndex - 1]
-            stateList[zeroIndex - 1] = '0'
-            newState = ''.join(stateList)
-            return [childNumber, int(newState)]
+        # Down Child
+        if zero_index <= 5:
+            new_board = list(str_board)
+            new_board[zero_index], new_board[zero_index + 3] = new_board[zero_index + 3], new_board[zero_index]
+            children.append( int(''.join(new_board)) )
 
-    def getRightChild(self, state):
-        strState = str(state)
-        if (len(strState) < 9):
-            strState = "0" + strState
-        zeroIndex = strState.index('0')
-        if (zeroIndex % 3 == 2):  # 2, 5, 8
-            return [-1, -1]
-        else:
-            newState = strState
-            childNumber = int(newState[zeroIndex + 1])
-            stateList = list(newState)
-            stateList[zeroIndex] = stateList[zeroIndex + 1]
-            stateList[zeroIndex + 1] = '0'
-            newState = ''.join(stateList)
-            return [childNumber, int(newState)]
+        # Left Child
+        if zero_index % 3 != 0:
+            new_board = list(str_board)
+            new_board[zero_index], new_board[zero_index - 1] = new_board[zero_index - 1], new_board[zero_index]
+            children.append( int(''.join(new_board)) )
+
+        # Right Child
+        if zero_index % 3 != 2:
+            new_board = list(str_board)
+            new_board[zero_index], new_board[zero_index + 1] = new_board[zero_index + 1], new_board[zero_index]
+            children.append(  int(''.join(new_board)))
+
+        return children
 
     def getPath(self):
         self.path = []
@@ -160,7 +111,7 @@ class BFS:
         return len(self.path)-1
 
     def getNodesExpanded(self):
-        return len(self.visited)
+        return len(self.visited)+1
 
     def getCostOfPath(self):
         return len(self.path)-1

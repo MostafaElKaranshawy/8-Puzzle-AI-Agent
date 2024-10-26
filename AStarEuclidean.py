@@ -15,6 +15,7 @@ class AStarEuclidean:
         self.start_board = start_board
         self.path = []
         self.path_directions = []
+        self.frontier_map = {}
 
 
     def a_star_euclidean(self):
@@ -32,21 +33,25 @@ class AStarEuclidean:
 
             self.visited.add(current_board)
             children_boards = self.get_all_children(current_board)
-            children_boards.sort()
+            # children_boards.sort()
 
             for child_board in children_boards:
-                if child_board not in self.visited:
+                if ( (child_board not in self.visited and child_board not in self.frontier_map) or
+                    (child_board in self.frontier_map and self.frontier_map[child_board] > current_depth + 1) ):
                     self.pq.put( (self.compute_cost_function(child_board, current_depth + 1), (child_board, current_depth + 1)) )
+                    self.frontier_map[child_board] = current_depth + 1
                     self.parent_map[child_board] = current_board
+
         return False
 
         # get_analysis
 
-
+    # compute the cost function of the board g(n) + h(n)
     def compute_cost_function(self, board, depth):
         return self.get_euclidean_distance(board) + depth
 
 
+    # compute the euclidean distance of the board
     def get_euclidean_distance(self, board):
         str_board = str(board)
         if len(str_board) < 9:
@@ -63,6 +68,7 @@ class AStarEuclidean:
         return distance
 
 
+    # get all the children of the board
     def get_all_children(self, board):
         str_board = str(board)
         if len(str_board) < 9:
@@ -97,6 +103,7 @@ class AStarEuclidean:
 
         return children
 
+    # get the path from the start board to the goal board
     def get_path(self):
         self.path = []
         current_board = self.goal_board
@@ -109,7 +116,9 @@ class AStarEuclidean:
         self.path_directions = self.get_path_directions()
 
         return self.path, self.path_directions
-    
+
+
+    # get the directions of the path
     def get_path_directions(self):
         parent = self.path[0]
         path_directions = []
@@ -140,15 +149,21 @@ class AStarEuclidean:
             return "LEFT"
         return ""
 
+
+    # get the max depth of the search
     def get_max_depth(self):
         return len(self.path) - 1  # -1 for removing the start node from the path
 
+
+    # get the number of nodes expanded
     def get_nodes_expanded(self):
         return len(self.visited) + 1  # +1 for expanding goal node
 
+    # get the cost of the path
     def get_cost_of_path(self):
         return len(self.path) - 1  # -1 for removing the start node from the path
 
+    # get the details of the search
     def get_details(self):
         cost_of_path = self.get_cost_of_path()
         number_of_nodes_expanded = self.get_nodes_expanded()

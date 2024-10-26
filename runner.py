@@ -14,7 +14,7 @@ def solve8Puzzle(method, initialState):
         bfs.solve()
         endTime = time.time()
         path, pathDirections = bfs.getPath()
-        details = bfs.getDetails()
+        details = bfs.get_details()
         details["Running Time"] = endTime - startTime
         return [path, pathDirections], details
     else:

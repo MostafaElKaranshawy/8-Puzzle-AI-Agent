@@ -1,22 +1,6 @@
-
-
-# 012345678    index 0f 1 mod 3 to get the x coordinate, index of 1 div 3 to get the y coordinate
-# 125340678     
-
-# 0 1 2        7 2 5
-# 3 4 5        3 4 1
-# 6 7 8        6 8 0
-
-# 1 -> 0     0 -> 2      2 -> 5          
-
-#  discuss
-#  1- names of the variables
-#  2- how to get the children
-#  3- depth vs explored nodes
-#  4- 
-
 import math
 from queue import PriorityQueue
+
 class AStarEuclidean:
     def __init__(self, start_board):
         self.visited = set()
@@ -36,7 +20,7 @@ class AStarEuclidean:
     def a_star_euclidean(self):
         self.pq.put( (self.compute_cost_function(self.start_board, 0), (self.start_board, 0) ))
         while not self.pq.empty():
-            current_state = self.pq.get()[1]  # get the state with the lowest cost from proirity, state
+            current_state = self.pq.get()[1]  # get the state with the lowest cost from priority, state
             current_board = current_state[0]
             current_depth = current_state[1]
 
@@ -92,16 +76,17 @@ class AStarEuclidean:
             new_board[zero_index], new_board[zero_index - 3] = new_board[zero_index - 3], new_board[zero_index]
             children.append( int(''.join(new_board)) )
 
-        # Down Child
-        if zero_index <= 5:
-            new_board = list(str_board)
-            new_board[zero_index], new_board[zero_index + 3] = new_board[zero_index + 3], new_board[zero_index]
-            children.append( int(''.join(new_board)) )
-
         # Left Child
         if zero_index % 3 != 0:
             new_board = list(str_board)
             new_board[zero_index], new_board[zero_index - 1] = new_board[zero_index - 1], new_board[zero_index]
+            children.append(int(''.join(new_board)))
+
+
+        # Down Child
+        if zero_index <= 5:
+            new_board = list(str_board)
+            new_board[zero_index], new_board[zero_index + 3] = new_board[zero_index + 3], new_board[zero_index]
             children.append( int(''.join(new_board)) )
 
         # Right Child
@@ -111,80 +96,67 @@ class AStarEuclidean:
             children.append(  int(''.join(new_board)))
 
         return children
-    
 
-    def getPath(self):
+    def get_path(self):
         self.path = []
         current_board = self.goal_board
         while current_board in self.parent_map:
             self.path.append(current_board)
             current_board = self.parent_map[current_board]
         self.path.append(current_board)
-        
-        self.path.reverse()
-        self.pathDirections = self.getPathDirections()
 
-        return self.path, self.pathDirections
+        self.path.reverse()
+        self.path_directions = self.get_path_directions()
+
+        return self.path, self.path_directions
     
-    def getPathDirections(self):
+    def get_path_directions(self):
         parent = self.path[0]
-        pathDirections = []
+        path_directions = []
         for i in range(1, len(self.path)):
             child = self.path[i]
-            direction = self.getDirection(parent, child)
+            direction = self.get_direction(parent, child)
             parent = child
-            pathDirections.append(direction)
-        return pathDirections
-    
-    def getDirection(self, parent, child):
+            path_directions.append(direction)
+        return path_directions
+
+    def get_direction(self, parent, child):
         parent = str(parent)
-        if(len(parent) < 9):
+        if len(parent) < 9:
             parent = '0' + parent
         child = str(child)
-        if(len(child) < 9):
+        if len(child) < 9:
             child = '0' + child
-        
-        zeroDiff = child.index('0') - parent.index('0')
-        if zeroDiff == 3:
+
+        zero_diff = child.index('0') - parent.index('0')
+        if zero_diff == 3:
             return "DOWN"
-        if zeroDiff == -3:            
+        if zero_diff == -3:
             return "UP"
-        if zeroDiff == 1:
+        if zero_diff == 1:
             return "RIGHT"
-        if zeroDiff == -1:
+        if zero_diff == -1:
             return "LEFT"
-        return ""    
-    
-    def getMaxDepth(self):
-        return len(self.path) - 1   # -1 for removing the start node from the path
-    
-    def getNodesExpanded(self):
-        return len(self.visited) + 1    # +1 for expanding goal node
-    
-    def getCostOfPath(self):
-        return len(self.path) - 1   # -1 for removing the start node from the path
+        return ""
+
+    def get_max_depth(self):
+        return len(self.path) - 1  # -1 for removing the start node from the path
+
+    def get_nodes_expanded(self):
+        return len(self.visited) + 1  # +1 for expanding goal node
+
+    def get_cost_of_path(self):
+        return len(self.path) - 1  # -1 for removing the start node from the path
 
 
-start_board = 125340678
+start_board = 103246578
 AStarEuclideanMethod = AStarEuclidean(start_board)
 
 AStarEuclideanMethod.a_star_euclidean()
-path, pathDirections = AStarEuclideanMethod.getPath()
+path, pathDirections = AStarEuclideanMethod.get_path()
     
 print(path)
 print(pathDirections)   
-print(AStarEuclideanMethod.getMaxDepth())
-print(AStarEuclideanMethod.getNodesExpanded()) 
-print(AStarEuclideanMethod.getCostOfPath()) 
-
-# 1 2 5
-# 3 4 0
-# 6 7 8
-
-
-
-#  path to goal  ✔️
-#  cost of path  ✔️
-#  nodes expanded ✔️
-#  search depth  ===========> 
-#  running time
+print(AStarEuclideanMethod.get_max_depth())
+print(AStarEuclideanMethod.get_nodes_expanded())
+print(AStarEuclideanMethod.get_cost_of_path())

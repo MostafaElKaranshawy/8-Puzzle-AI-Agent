@@ -1,36 +1,38 @@
 from queue import Queue
 
-
 class BFS:
-    def __init__(self, startState):
+    def __init__(self, start_state):
         self.visited = set()
         self.queue = Queue()
-        self.goalState = 12345678
-        self.parentMap = {}
-        self.startState = startState
+        self.goal_state = 12345678
+        self.parent_map = {}
+        self.start_state = start_state
         self.path = []
-        self.pathDirections = []
+        self.path_directions = []
 
     def solve(self):
-        self.queue.put(self.startState)
-        while (self.queue.qsize() > 0):
-            currentState = self.queue.get()
-            if currentState == self.goalState:
-                return True
-            if currentState in self.visited:
-                continue
-            self.visited.add(currentState)
+        self.queue.put(self.start_state)
+        while not self.queue.empty():
 
-            children = self.getAllChildren(currentState)
-            children.sort()
+            current_state = self.queue.get()
+            if current_state == self.goal_state:
+                return True
+
+            if current_state in self.visited:
+                continue
+
+            self.visited.add(current_state)
+
+            children = self.get_all_children(current_state)
+            # children.sort()
 
             for child in children:
                 if child not in self.visited and child not in list(self.queue.queue):
                     self.queue.put(child)
-                    self.parentMap[child] = currentState
+                    self.parent_map[child] = current_state
         return False
 
-    def getAllChildren(self, board):
+    def get_all_children(self, board):
         str_board = str(board)
         if len(str_board) < 9:
             str_board = "0" + str_board
@@ -43,87 +45,104 @@ class BFS:
             new_board[zero_index], new_board[zero_index - 3] = new_board[zero_index - 3], new_board[zero_index]
             children.append( int(''.join(new_board)) )
 
-        # Down Child
-        if zero_index <= 5:
-            new_board = list(str_board)
-            new_board[zero_index], new_board[zero_index + 3] = new_board[zero_index + 3], new_board[zero_index]
-            children.append( int(''.join(new_board)) )
-
         # Left Child
         if zero_index % 3 != 0:
             new_board = list(str_board)
             new_board[zero_index], new_board[zero_index - 1] = new_board[zero_index - 1], new_board[zero_index]
             children.append( int(''.join(new_board)) )
 
+        # Down Child
+        if zero_index <= 5:
+            new_board = list(str_board)
+            new_board[zero_index], new_board[zero_index + 3] = new_board[zero_index + 3], new_board[zero_index]
+            children.append( int(''.join(new_board)) )
+
         # Right Child
         if zero_index % 3 != 2:
             new_board = list(str_board)
             new_board[zero_index], new_board[zero_index + 1] = new_board[zero_index + 1], new_board[zero_index]
-            children.append(  int(''.join(new_board)))
+            children.append( int(''.join(new_board)) )
 
         return children
 
-    def getPath(self):
+
+    def get_path(self):
         self.path = []
-        currentState = self.goalState
-        previosState = currentState
-        while currentState in self.parentMap:
-            self.path.append(currentState)
-            currentState = self.parentMap[currentState]
-        self.path.append(currentState)
+        current_state = self.goal_state
+        while current_state in self.parent_map:
+            self.path.append(current_state)
+            current_state = self.parent_map[current_state]
+        self.path.append(current_state)
 
         self.path.reverse()
-        self.pathDirections = self.getPathDirections()
+        self.path_directions = self.get_path_directions()
 
-        return self.path, self.pathDirections
+        return self.path, self.path_directions
 
-    def getPathDirections(self):
+    def get_path_directions(self):
         parent = self.path[0]
-        pathDirections = []
+        path_directions = []
         for i in range(1, len(self.path)):
             child = self.path[i]
-            direction = self.getDirection(parent, child)
+            direction = self.get_direction(parent, child)
             parent = child
-            pathDirections.append(direction)
-        pathDirections.append("Goal State Reached!")
-        return pathDirections
+            path_directions.append(direction)
+        path_directions.append("Goal State Reached!")
+        return path_directions
 
-    def getDirection(self, parent, child):
+    def get_direction(self, parent, child):
         parent = str(parent)
-        if (len(parent) < 9):
+        if len(parent) < 9:
             parent = '0' + parent
         child = str(child)
-        if (len(child) < 9):
+        if len(child) < 9:
             child = '0' + child
 
-        zeroDiff = child.index('0') - parent.index('0')
-        if zeroDiff == 3:
+        zero_diff = child.index('0') - parent.index('0')
+        if zero_diff == 3:
             return "DOWN"
-        if zeroDiff == -3:
+        if zero_diff == -3:
             return "UP"
-        if zeroDiff == 1:
+        if zero_diff == 1:
             return "RIGHT"
-        if zeroDiff == -1:
+        if zero_diff == -1:
             return "LEFT"
         return ""
 
-    def getMaxDepth(self):
+    def get_max_depth(self):
         return len(self.path)-1
 
-    def getNodesExpanded(self):
+    def get_nodes_expanded(self):
         return len(self.visited)+1
 
-    def getCostOfPath(self):
+    def get_cost_of_path(self):
         return len(self.path)-1
 
-    def getDetails(self):
-        costOfPath = self.getCostOfPath()
-        numberOfNodesExpanded = self.getNodesExpanded()
-        searchDepth = self.getMaxDepth()
-        maxSearchDepth = self.getMaxDepth()
+    def get_details(self):
+        cost_of_path = self.get_cost_of_path()
+        number_of_nodes_expanded = self.get_nodes_expanded()
+        search_depth = self.get_max_depth()
+        max_search_depth = self.get_max_depth()
         return {
-            "Cost of the Path": costOfPath,
-            "Number of Nodes Expanded": numberOfNodesExpanded,
-            "Search Depth": searchDepth,
-            "Max Search Depth": maxSearchDepth,
+            "Cost of the Path": cost_of_path,
+            "Number of Nodes Expanded": number_of_nodes_expanded,
+            "Search Depth": search_depth,
+            "Max Search Depth": max_search_depth,
         }
+
+# 1 0 3
+# 2 4 6
+# 5 7 8
+
+
+start_board = 103246578
+BFSMethod = BFS(start_board)
+
+BFSMethod.solve()
+path, path_directions = BFSMethod.get_path()
+
+print(path)
+print(path_directions)
+print(BFSMethod.get_max_depth())
+print(BFSMethod.get_nodes_expanded())
+print(BFSMethod.get_cost_of_path())

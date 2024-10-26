@@ -1,43 +1,58 @@
 import datetime
-
-class DFS:
+class IDS:
     def __init__(self, start_state):
-        self.visited = set()
-        self.stack = [] # Stack()
+        self.visited = {}  # Store the depth each state was visited
+        self.stack = []
         self.goal_state = 12345678
         self.parent_map = {}
         self.start_state = start_state
         self.max_depth = 0
+        self.nodes_expanded = 0
         self.path = []
         self.path_directions = []
+
+    def ids(self):
+        for limit_depth in range(0, 32):
+            self.visited = {}
+            self.stack = []
+            self.parent_map = {}
+            self.max_depth = 0
+            self.stack.append((self.start_state, 0))
+            
+            while len(self.stack) > 0:
+                current_state, depth = self.stack.pop()
+                self.visited[current_state] = depth
+                self.nodes_expanded += 1
+
+                if depth > self.max_depth:
+                    self.max_depth = depth
+
+                if current_state == self.goal_state:
+                    return True         
+                
+                if depth == limit_depth:
+                    continue
+
+                children = self.get_all_children(current_state)
+                children.reverse()  # Reverse for stack (LIFO)
+                
+                for child in children:
+                    if self.not_in_visited_or_better_depth(child, depth) and not self.is_in_stack_or_bigger_depth(child, depth):
+                        self.stack.append((child, depth + 1))
+                        self.parent_map[child] = current_state
+        return False
     
-    def dfs(self):
-        self.stack.append((self.start_state, 0))
-        while len(self.stack) > 0:
-            current_state, depth = self.stack.pop()
-            self.visited.add(current_state)
-            if depth > self.max_depth:
-                self.max_depth = depth
-
-            if current_state == self.goal_state:
-                return True
-            children = self.get_all_children(current_state)
-            children.reverse() # reverse for DFS to maintain the ordering
-
-            for child in children:
-                if child not in self.visited and not self.is_in_stack(child):
-                    self.stack.append((child, depth + 1))
-                    self.parent_map[child] = current_state
-        return False            
-
-    def is_in_stack(self, state):
-         return any(state == item[0] for item in self.stack)
+    def not_in_visited_or_better_depth(self, child, depth):
+        return child not in self.visited or self.visited[child] > depth + 1
+    
+    def is_in_stack_or_bigger_depth(self, state, depth):
+        return any(state == item[0] and depth + 1 > item[1]  for item in self.stack)
 
     def get_all_children(self, board):
         str_board = str(board).zfill(9)
         zero_index = str_board.index('0')
         children = []
-
+        
         # Up Child
         if zero_index >= 3:
             new_board = list(str_board)
@@ -74,7 +89,7 @@ class DFS:
         self.path.reverse()
         self.path_directions = self.get_path_directions()
         return self.path, self.path_directions
-    
+
     def get_path_directions(self):
         parent = self.path[0]
         path_directions = []
@@ -84,15 +99,10 @@ class DFS:
             parent = child
             path_directions.append(direction)
         return path_directions
-   
+
     def get_direction(self, parent, child):
-        parent = str(parent)
-        if len(parent) < 9:
-            parent = '0' + parent
-        child = str(child)
-        if len(child) < 9:
-            child = '0' + child
-        
+        parent = str(parent).zfill(9)
+        child = str(child).zfill(9)
         zero_diff = child.index('0') - parent.index('0')
         if zero_diff == 3:
             return "DOWN"
@@ -108,27 +118,24 @@ class DFS:
         return self.max_depth
 
     def get_nodes_expanded(self):
-
-        return len(self.visited)   # no + 1 as the goal is added to visited
+        return self.nodes_expanded
 
     def get_cost_of_path(self):
         return len(self.path_directions)
 
 
-
-
+# Example usage
 start_state = 103246578
-dfsMethod = DFS(start_state)
+idsMethod = IDS(start_state)
 start_time = datetime.datetime.now()
-dfsMethod.dfs()
+idsMethod.ids()
 end_time = datetime.datetime.now()
-path, pathDirections = dfsMethod.get_path()
+path, pathDirections = idsMethod.get_path()
 cost = len(pathDirections)
-# print("Path To Goal",path)
-# print("Directions Towards Goal",pathDirections)
-print("Cost Of Path: ", cost)
-print("Nodes Expanded: ", len(dfsMethod.visited))
-print("Search Depth: ", dfsMethod.max_depth)
-print("Running Time: ", end_time-start_time)
 
-#328451670
+# print("Path To Goal:", path)
+# print("Directions Towards Goal:", pathDirections)
+print("Cost Of Path:", cost)
+print("Nodes Expanded:", len(idsMethod.visited))
+print("Search Depth:", idsMethod.max_depth)
+print("Running Time:", end_time - start_time)

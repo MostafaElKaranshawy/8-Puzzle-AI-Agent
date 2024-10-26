@@ -118,11 +118,9 @@ class DFS:
     def get_details(self):
         cost_of_path = self.get_cost_of_path()
         number_of_nodes_expanded = self.get_nodes_expanded()
-        search_depth = self.get_max_depth()
         max_search_depth = self.get_max_depth()
         return {
             "Cost of the Path": cost_of_path,
             "Number of Nodes Expanded": number_of_nodes_expanded,
-            "Search Depth": search_depth,
             "Max Search Depth": max_search_depth,
         }

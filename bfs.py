@@ -1,5 +1,6 @@
 from queue import Queue
 
+
 class BFS:
     def __init__(self, start_state):
         self.visited = set()
@@ -10,28 +11,34 @@ class BFS:
         self.path = []
         self.path_directions = []
 
-    def dfs(self):
+    # Main BFS Function
+    def bfs(self):
         self.queue.put(self.start_state)
         while not self.queue.empty():
-
+            # pop the current state from the queue
             current_state = self.queue.get()
+
+            # check if the current state is the goal state
             if current_state == self.goal_state:
                 return True
 
+            # check if the current state is already visited
             if current_state in self.visited:
                 continue
 
+            # add the current state to the visited set
             self.visited.add(current_state)
 
+            # get all the children of the current state
             children = self.get_all_children(current_state)
-            # children.sort()
 
-            for child in children:
+            for child in children:  # add the not visited children to the queue
                 if child not in self.visited and child not in list(self.queue.queue):
                     self.queue.put(child)
                     self.parent_map[child] = current_state
         return False
 
+    # Get all the children of the current state function
     def get_all_children(self, board):
         str_board = str(board)
         if len(str_board) < 9:
@@ -65,20 +72,26 @@ class BFS:
 
         return children
 
-
+    # Get the path from the parent map
     def get_path(self):
         self.path = []
         current_state = self.goal_state
+
+        # reversly get the path from the parent map
         while current_state in self.parent_map:
             self.path.append(current_state)
             current_state = self.parent_map[current_state]
         self.path.append(current_state)
 
+        # reverse the path to get the correct path
         self.path.reverse()
+
+        # get the path directions (up, left, down, right)
         self.path_directions = self.get_path_directions()
 
         return self.path, self.path_directions
 
+    # Get the path directions (up, left, down, right)
     def get_path_directions(self):
         parent = self.path[0]
         path_directions = []
@@ -90,6 +103,7 @@ class BFS:
         path_directions.append("Goal State Reached!")
         return path_directions
 
+    # Get the direction from the parent to the child
     def get_direction(self, parent, child):
         parent = str(parent)
         if len(parent) < 9:
@@ -109,23 +123,25 @@ class BFS:
             return "LEFT"
         return ""
 
+    # Get the max depth of the search
     def get_max_depth(self):
         return len(self.path)-1
 
+    # Get the number of nodes expanded(visited)
     def get_nodes_expanded(self):
         return len(self.visited)+1
 
+    # Get the cost of the path
     def get_cost_of_path(self):
         return len(self.path)-1
 
+    # Get the details of the search (cost of the path, number of nodes expanded, max search depth)
     def get_details(self):
         cost_of_path = self.get_cost_of_path()
         number_of_nodes_expanded = self.get_nodes_expanded()
-        search_depth = self.get_max_depth()
         max_search_depth = self.get_max_depth()
         return {
             "Cost of the Path": cost_of_path,
             "Number of Nodes Expanded": number_of_nodes_expanded,
-            "Search Depth": search_depth,
             "Max Search Depth": max_search_depth,
         }

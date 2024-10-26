@@ -8,12 +8,12 @@ import time
 import tkinter as tk
 from tkinter import ttk, messagebox
 
-
+# Methods handler
 def solve_8Puzzle(method, initial_state):
     if method == "BFS":
         bfs = BFS(initial_state)
         start_time = time.time()
-        bfs.dfs()
+        bfs.bfs()
         end_time = time.time()
         path, path_directions = bfs.get_path()
         details = bfs.get_details()
@@ -58,7 +58,7 @@ def solve_8Puzzle(method, initial_state):
     else:
         return None, None
 
-
+# Game GUI runner class
 class PuzzleApp:
     def __init__(self, root):
         self.root = root
@@ -71,7 +71,6 @@ class PuzzleApp:
         self.details = {
             "Cost of the Path": 0,
             "Number of Nodes Expanded": 0,
-            "Search Depth": 0,
             "Max Search Depth": 0,
             "Running Time": 0
         }
@@ -144,7 +143,8 @@ class PuzzleApp:
         self.goal_button = tk.Button(root, text="Goal State", command=self.show_goal, state=tk.DISABLED, bg='black',
                                      fg='white')
         self.goal_button.pack(side=tk.LEFT, padx=20)
-        # Show solution details button
+
+        # Solution details button
         self.details_button = tk.Button(root, text="Show Solution Details", state=tk.DISABLED,
                                         command=self.show_details,
                                         bg='black',
@@ -156,7 +156,7 @@ class PuzzleApp:
             input_values = self.initial_state_entry.get()  # Get input and strip whitespace
             str_input = str(input_values)
 
-            # Validations
+            # Input Validations
             if len(str_input) < 9:
                 str_input = '0' + str_input
 
@@ -177,6 +177,7 @@ class PuzzleApp:
             messagebox.showerror("Error", f"Invalid input: {e}")
             return None
 
+    # Display the initial state of the puzzle
     def show_game(self):
         initial_state = self.parse_initial_state()
         if not initial_state:
@@ -202,6 +203,7 @@ class PuzzleApp:
                 else:
                     self.grid_cells[row][col].config(text=str(value), bg='white')
 
+    # Handle the solving process, reset previous solutions and details
     def handle_solving(self):
         self.solution = []
         self.details = []
@@ -224,7 +226,9 @@ class PuzzleApp:
             return
         self.start_solving(method, initial_state)
 
+    # Start solving the puzzle
     def start_solving(self, method=None, initial_state=None):
+        # Check for the method and initial state inputs
         if method is None:
             messagebox.showerror("Error", "You should select a method first!")
             return
@@ -232,13 +236,18 @@ class PuzzleApp:
             messagebox.showerror("Error", "You should enter an initial state first!")
             return
 
+        # Solve the puzzle
         self.solution, self.details = solve_8Puzzle(method, initial_state)
 
         self.solve_button['state'] = tk.NORMAL
         self.show_game_button['state'] = tk.NORMAL
+
+        # No solution found or an error occurred
         if not self.solution:
             messagebox.showerror("Error", "No solution found!")
             return
+
+        # Solution found
         self.current_step = 0
         self.update_grid_display()
         self.prev_button['state'] = tk.DISABLED
@@ -248,8 +257,9 @@ class PuzzleApp:
         if self.current_step == len(self.solution[0]) - 1:
             self.next_button['state'] = tk.DISABLED
 
+    # Update the grid display with the current state
     def update_grid_display(self):
-        # solution = [path, path_directions]
+        # solution is [path, path_directions]
         if self.solution:
             current_state = str(self.solution[0][self.current_step])
             next_step = self.solution[1][self.current_step]
@@ -260,6 +270,8 @@ class PuzzleApp:
             if len(current_state) < 9:
                 current_state = '0' + current_state
             current_state = [current_state[i:i + 3] for i in range(0, 9, 3)]
+
+            # update the grid display
             for row in range(3):
                 for col in range(3):
                     value = current_state[row][col]
@@ -268,6 +280,7 @@ class PuzzleApp:
                     else:
                         self.grid_cells[row][col].config(text=str(value), bg='white')
 
+    # handle next step button
     def next_step(self):
         if self.current_step < len(self.solution[0]) - 1:
             self.current_step += 1
@@ -276,6 +289,7 @@ class PuzzleApp:
         if self.current_step == len(self.solution[0]) - 1:
             self.next_button['state'] = tk.DISABLED
 
+    # handle previous step button
     def prev_step(self):
         if self.current_step > 0:
             self.current_step -= 1
@@ -284,6 +298,7 @@ class PuzzleApp:
         if self.current_step == 0:
             self.prev_button['state'] = tk.DISABLED
 
+    # show the solution details
     def show_details(self):
         if self.details:
             details = "\n".join([f"{key}: {value}" for key, value in self.details.items()])
@@ -291,6 +306,7 @@ class PuzzleApp:
         else:
             messagebox.showinfo("Solution Details", "No solution available.")
 
+    # check if the puzzle is solvable
     def check_solvable(self, puzzle):
         inv_count = 0
         puzzle = str(puzzle)
@@ -302,6 +318,7 @@ class PuzzleApp:
                     inv_count += 1
         return inv_count % 2 == 0
 
+    # show the goal state (move directly to the goal state)
     def show_goal(self):
         self.current_step = len(self.solution[0]) - 1
         self.update_grid_display()

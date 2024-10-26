@@ -10,7 +10,7 @@ class BFS:
         self.path = []
         self.path_directions = []
 
-    def solve(self):
+    def dfs(self):
         self.queue.put(self.start_state)
         while not self.queue.empty():
 
@@ -129,20 +129,3 @@ class BFS:
             "Search Depth": search_depth,
             "Max Search Depth": max_search_depth,
         }
-
-# 1 0 3
-# 2 4 6
-# 5 7 8
-
-
-start_board = 103246578
-BFSMethod = BFS(start_board)
-
-BFSMethod.solve()
-path, path_directions = BFSMethod.get_path()
-
-print(path)
-print(path_directions)
-print(BFSMethod.get_max_depth())
-print(BFSMethod.get_nodes_expanded())
-print(BFSMethod.get_cost_of_path())

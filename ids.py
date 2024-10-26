@@ -98,6 +98,7 @@ class IDS:
             direction = self.get_direction(parent, child)
             parent = child
             path_directions.append(direction)
+        path_directions.append("Goal State Reached!")
         return path_directions
 
     def get_direction(self, parent, child):
@@ -121,21 +122,16 @@ class IDS:
         return self.nodes_expanded
 
     def get_cost_of_path(self):
-        return len(self.path_directions)
+        return len(self.path)-1
 
-
-# Example usage
-start_state = 103246578
-idsMethod = IDS(start_state)
-start_time = datetime.datetime.now()
-idsMethod.ids()
-end_time = datetime.datetime.now()
-path, pathDirections = idsMethod.get_path()
-cost = len(pathDirections)
-
-# print("Path To Goal:", path)
-# print("Directions Towards Goal:", pathDirections)
-print("Cost Of Path:", cost)
-print("Nodes Expanded:", len(idsMethod.visited))
-print("Search Depth:", idsMethod.max_depth)
-print("Running Time:", end_time - start_time)
+    def get_details(self):
+        cost_of_path = self.get_cost_of_path()
+        number_of_nodes_expanded = self.get_nodes_expanded()
+        search_depth = self.get_max_depth()
+        max_search_depth = self.get_max_depth()
+        return {
+            "Cost of the Path": cost_of_path,
+            "Number of Nodes Expanded": number_of_nodes_expanded,
+            "Search Depth": search_depth,
+            "Max Search Depth": max_search_depth,
+        }

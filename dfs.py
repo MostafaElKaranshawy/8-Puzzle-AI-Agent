@@ -83,6 +83,7 @@ class DFS:
             direction = self.get_direction(parent, child)
             parent = child
             path_directions.append(direction)
+        path_directions.append("Goal State Reached!")
         return path_directions
    
     def get_direction(self, parent, child):
@@ -112,23 +113,16 @@ class DFS:
         return len(self.visited)   # no + 1 as the goal is added to visited
 
     def get_cost_of_path(self):
-        return len(self.path_directions)
+        return len(self.path)-1
 
-
-
-
-start_state = 103246578
-dfsMethod = DFS(start_state)
-start_time = datetime.datetime.now()
-dfsMethod.dfs()
-end_time = datetime.datetime.now()
-path, pathDirections = dfsMethod.get_path()
-cost = len(pathDirections)
-# print("Path To Goal",path)
-# print("Directions Towards Goal",pathDirections)
-print("Cost Of Path: ", cost)
-print("Nodes Expanded: ", len(dfsMethod.visited))
-print("Search Depth: ", dfsMethod.max_depth)
-print("Running Time: ", end_time-start_time)
-
-#328451670
+    def get_details(self):
+        cost_of_path = self.get_cost_of_path()
+        number_of_nodes_expanded = self.get_nodes_expanded()
+        search_depth = self.get_max_depth()
+        max_search_depth = self.get_max_depth()
+        return {
+            "Cost of the Path": cost_of_path,
+            "Number of Nodes Expanded": number_of_nodes_expanded,
+            "Search Depth": search_depth,
+            "Max Search Depth": max_search_depth,
+        }

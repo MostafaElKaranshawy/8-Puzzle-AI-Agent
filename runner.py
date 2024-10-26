@@ -1,22 +1,60 @@
 from bfs import BFS
+from dfs import DFS
+from ids import IDS
+from AStarEuclidean import AStarEuclidean
+from AStarManhattan import AStarManhattan
+
 import time
 import tkinter as tk
 from tkinter import ttk, messagebox
 
 
-# Sample 8-puzzle solver methods (replace with actual algorithm implementations)
-def solve8Puzzle(method, initialState):
-    # Replace with the actual puzzle solving logic
-    # This is a placeholder for the sequence of states leading to the solution.
+def solve_8Puzzle(method, initial_state):
     if method == "BFS":
-        bfs = BFS(initialState)
-        startTime = time.time()
-        bfs.solve()
-        endTime = time.time()
-        path, pathDirections = bfs.getPath()
+        bfs = BFS(initial_state)
+        start_time = time.time()
+        bfs.dfs()
+        end_time = time.time()
+        path, path_directions = bfs.get_path()
         details = bfs.get_details()
-        details["Running Time"] = endTime - startTime
-        return [path, pathDirections], details
+        details["Running Time"] = end_time - start_time
+        return [path, path_directions], details
+    elif method == "DFS":
+        dfs = DFS(initial_state)
+        start_time = time.time()
+        dfs.dfs()
+        end_time = time.time()
+        path, path_directions = dfs.get_path()
+        details = dfs.get_details()
+        details["Running Time"] = end_time - start_time
+        return [path, path_directions], details
+    elif method == "IDS":
+        ids = IDS(initial_state)
+        start_time = time.time()
+        ids.ids()
+        end_time = time.time()
+        path, path_directions = ids.get_path()
+        details = ids.get_details()
+        details["Running Time"] = end_time - start_time
+        return [path, path_directions], details
+    elif method == "A* Euclidean":
+        a_star_euclidean = AStarEuclidean(initial_state)
+        start_time = time.time()
+        a_star_euclidean.a_star_euclidean()
+        end_time = time.time()
+        path, path_directions = a_star_euclidean.get_path()
+        details = a_star_euclidean.get_details()
+        details["Running Time"] = end_time - start_time
+        return [path, path_directions], details
+    elif method == "A* Manhattan":
+        a_star_manhattan = AStarManhattan(initial_state)
+        start_time = time.time()
+        a_star_manhattan.a_star_manhattan()
+        end_time = time.time()
+        path, path_directions = a_star_manhattan.get_path()
+        details = a_star_manhattan.get_details()
+        details["Running Time"] = end_time - start_time
+        return [path, path_directions], details
     else:
         return None, None
 
@@ -28,8 +66,8 @@ class PuzzleApp:
         self.root.configure(bg='black')
 
         self.solution = []
-        self.currentStep = -1
-        self.gridCells = []
+        self.current_step = -1
+        self.grid_cells = []
         self.details = {
             "Cost of the Path": 0,
             "Number of Nodes Expanded": 0,
@@ -40,189 +78,235 @@ class PuzzleApp:
 
         # Dropdown for selecting solving method
         # Frame for the method selection
-        methodFrame = tk.Frame(root, bg='black')
-        methodFrame.pack(pady=10)  # Add some vertical spacing
+        method_frame = tk.Frame(root, bg='black')
+        method_frame.pack(pady=10)  # Add some vertical spacing
 
-        self.methodLabel = tk.Label(methodFrame, text="Select Method:", bg='black', fg='white')
-        self.methodLabel.pack(side=tk.LEFT)
+        self.method_label = tk.Label(method_frame, text="Select Method:", bg='black', fg='white')
+        self.method_label.pack(side=tk.LEFT)
 
-        self.methodVar = tk.StringVar()
-        self.methodDropdown = ttk.Combobox(methodFrame, textvariable=self.methodVar)
-        self.methodDropdown['values'] = ["BFS", "DFS", "IDS", "A*"]  # Add more methods as needed
-        self.methodDropdown.current(0)
-        self.methodDropdown.pack(side=tk.LEFT)  # Pack it next to the label
+        self.method_var = tk.StringVar()
+        self.method_dropdown = ttk.Combobox(method_frame, textvariable=self.method_var)
+        self.method_dropdown['values'] = ["BFS", "DFS", "IDS", "A* Euclidean", "A* Manhattan"]
+        self.method_dropdown.current(0)
+        self.method_dropdown.pack(side=tk.LEFT)  # Pack it next to the label
 
         # Frame for the initial state input
-        initialStateFrame = tk.Frame(root, bg='black')
-        initialStateFrame.pack(pady=10)  # Add some vertical spacing
+        initial_state_frame = tk.Frame(root, bg='black')
+        initial_state_frame.pack(pady=10)  # Add some vertical spacing
 
-        self.initialStateLabel = tk.Label(initialStateFrame, text="Enter Initial State as 012345678", bg='black', fg='white')
-        self.initialStateLabel.pack(side=tk.LEFT)
+        self.initial_state_label = tk.Label(initial_state_frame, text="Enter Initial State as 012345678", bg='black',
+                                            fg='white')
+        self.initial_state_label.pack(side=tk.LEFT)
 
-        self.initialStateEntry = tk.Entry(initialStateFrame)
-        self.initialStateEntry.pack(side=tk.LEFT)  # Pack it next to the label
-
+        self.initial_state_entry = tk.Entry(initial_state_frame)
+        self.initial_state_entry.pack(side=tk.LEFT)  # Pack it next to the label
 
         # Frame for buttons
-        buttonFrame = tk.Frame(root, bg='black')
-        buttonFrame.pack(pady=20)
+        button_frame = tk.Frame(root, bg='black')
+        button_frame.pack(pady=20)
 
         # Show Game button
-        self.showGameButton = tk.Button(buttonFrame, text="Show Game", command=self.showGame, bg='black', fg='white')
-        self.showGameButton.pack(side=tk.LEFT, padx=10)  # Add some padding to the left and right
+        self.show_game_button = tk.Button(button_frame, text="Show Game", command=self.show_game, bg='black',
+                                          fg='white')
+        self.show_game_button.pack(side=tk.LEFT, padx=10)  # Add some padding to the left and right
 
         # Start solving button
-        self.solveButton = tk.Button(buttonFrame, text="Start Solving", command=self.startSolving, bg='black', fg='white')
-        self.solveButton.pack(side=tk.LEFT, padx=10)  # Add some padding to the left and right
+        self.solve_button = tk.Button(button_frame, text="Start Solving", command=self.handle_solving, bg='black',
+                                      fg='white')
+        self.solve_button.pack(side=tk.LEFT, padx=10)  # Add some padding to the left and right
 
         # State label
-        self.stateLabel = tk.Label(root, text="Initial State", bg='black', fg='white', font=("Helvetica", 16))
-        self.stateLabel.pack(pady=10)
+        self.state_label = tk.Label(root, text="Initial State", bg='black', fg='white', font=("Helvetica", 16))
+        self.state_label.pack(pady=10)
 
         # Grid display area
-        self.gridFrame = tk.Frame(root, bg='black')
-        self.gridFrame.pack()
+        self.grid_frame = tk.Frame(root, bg='black')
+        self.grid_frame.pack()
 
         # Create a 3x3 grid for the puzzle
         for row in range(3):
-            rowCells = []
+            row_cells = []
             for col in range(3):
-                label = tk.Label(self.gridFrame, text="", font=("Helvetica", 32), width=4, height=2, bg='white')
+                label = tk.Label(self.grid_frame, text="", font=("Helvetica", 32), width=4, height=2, bg='white')
                 label.grid(row=row, column=col, padx=5, pady=5)
-                rowCells.append(label)
-            self.gridCells.append(rowCells)
+                row_cells.append(label)
+            self.grid_cells.append(row_cells)
 
         # Navigation buttons
-        self.prevButton = tk.Button(root, text="Prev", command=self.prevStep, state=tk.DISABLED, bg='black',
+        self.prev_button = tk.Button(root, text="Prev", command=self.prev_step, state=tk.DISABLED, bg='black',
                                      fg='white')
-        self.prevButton.pack(side=tk.LEFT, padx=20)
+        self.prev_button.pack(side=tk.LEFT, padx=20)
 
-        self.nextButton = tk.Button(root, text="Next", command=self.nextStep, state=tk.DISABLED, bg='black',
+        self.next_button = tk.Button(root, text="Next", command=self.next_step, state=tk.DISABLED, bg='black',
                                      fg='white')
-        self.nextButton.pack(side=tk.LEFT, padx=20)
+        self.next_button.pack(side=tk.LEFT, padx=20)
 
+        self.goal_button = tk.Button(root, text="Goal State", command=self.show_goal, state=tk.DISABLED, bg='black',
+                                     fg='white')
+        self.goal_button.pack(side=tk.LEFT, padx=20)
         # Show solution details button
-        self.detailsButton = tk.Button(root, text="Show Solution Details", state=tk.DISABLED, command=self.showDetails, bg='black',
+        self.details_button = tk.Button(root, text="Show Solution Details", state=tk.DISABLED,
+                                        command=self.show_details,
+                                        bg='black',
                                         fg='white')
-        self.detailsButton.pack(pady=20)
+        self.details_button.pack(pady=20)
 
-    def parseInitialState(self):
+    def parse_initial_state(self):
         try:
-            inputValues = self.initialStateEntry.get()  # Get input and strip whitespace
-            strInput = str(inputValues)
+            input_values = self.initial_state_entry.get()  # Get input and strip whitespace
+            str_input = str(input_values)
 
             # Validations
-            if len(strInput) < 9:
-                strInput = '0' + strInput
+            if len(str_input) < 9:
+                str_input = '0' + str_input
 
-            if len(strInput) != 9:
+            if len(str_input) != 9:
                 raise ValueError("Input must be exactly 9 characters long.")
 
-            if not strInput.isdigit():
+            if not str_input.isdigit():
                 raise ValueError("Input must contain only digits.")
 
-            digitSet = set(strInput)
-            if digitSet != set("012345678"):
+            digit_set = set(str_input)
+            if digit_set != set("012345678"):
                 raise ValueError("Input must contain all digits from 0 to 8 exactly once.")
 
-            return int(inputValues)
+            return int(input_values)
 
         except ValueError as e:
             print(e)
             messagebox.showerror("Error", f"Invalid input: {e}")
             return None
 
-    def showGame(self):
-        initialState = self.parseInitialState()
-        if not initialState:
+    def show_game(self):
+        initial_state = self.parse_initial_state()
+        if not initial_state:
             return
+        self.solution = []
+        self.details = []
+        self.current_step = -1
+        self.prev_button['state'] = tk.DISABLED
+        self.next_button['state'] = tk.DISABLED
+        self.goal_button['state'] = tk.DISABLED
+        self.details_button['state'] = tk.DISABLED
 
-        initialState = str(initialState)
-        if len(initialState) < 9:
-            initialState = '0' + initialState
-        initialState = [initialState[i:i + 3] for i in range(0, 9, 3)]
+        initial_state = str(initial_state)
+        if len(initial_state) < 9:
+            initial_state = '0' + initial_state
+        initial_state = [initial_state[i:i + 3] for i in range(0, 9, 3)]
 
         for row in range(3):
             for col in range(3):
-                value = initialState[row][col]
+                value = initial_state[row][col]
                 if value == '0':
-                    print("yessss")
-                    self.gridCells[row][col].config(text="", bg='lightBlue')
+                    self.grid_cells[row][col].config(text="", bg='lightBlue')
                 else:
-                    self.gridCells[row][col].config(text=str(value), bg='white')
-    
-    def startSolving(self):
+                    self.grid_cells[row][col].config(text=str(value), bg='white')
+
+    def handle_solving(self):
         self.solution = []
         self.details = []
+        self.current_step = -1
+        self.prev_button['state'] = tk.DISABLED
+        self.next_button['state'] = tk.DISABLED
+        self.goal_button['state'] = tk.DISABLED
+        self.details_button['state'] = tk.DISABLED
+        self.show_game_button['state'] = tk.DISABLED
+        self.show_game()
+        initial_state = self.parse_initial_state()
+        if not initial_state:
+            return
+        if not self.check_solvable(initial_state):
+            messagebox.showerror("Error", "Puzzle is not solvable!")
+            return
+        method = self.method_var.get()
+        if method is None:
+            messagebox.showerror("Error", "You should select a method first!")
+            return
+        self.start_solving(method, initial_state)
 
-        initialState = self.parseInitialState()
-        if not initialState:
+    def start_solving(self, method=None, initial_state=None):
+        if method is None:
+            messagebox.showerror("Error", "You should select a method first!")
+            return
+        if initial_state is None:
+            messagebox.showerror("Error", "You should enter an initial state first!")
             return
 
-        self.solveButton['state'] = tk.DISABLED
-        self.showGameButton['state'] = tk.DISABLED
-        self.showGame()
+        self.solution, self.details = solve_8Puzzle(method, initial_state)
 
-        method = self.methodVar.get()
-
-        self.solution, self.details = solve8Puzzle(method, initialState)
-
-        self.solveButton['state'] = tk.NORMAL
-        self.showGameButton['state'] = tk.NORMAL
+        self.solve_button['state'] = tk.NORMAL
+        self.show_game_button['state'] = tk.NORMAL
         if not self.solution:
             messagebox.showerror("Error", "No solution found!")
             return
+        self.current_step = 0
+        self.update_grid_display()
+        self.prev_button['state'] = tk.DISABLED
+        self.next_button['state'] = tk.NORMAL
+        self.goal_button['state'] = tk.NORMAL
+        self.details_button['state'] = tk.NORMAL
+        if self.current_step == len(self.solution[0]) - 1:
+            self.next_button['state'] = tk.DISABLED
 
-        self.currentStep = 0
-        self.updateGridDisplay()
-        self.prevButton['state'] = tk.DISABLED
-        self.nextButton['state'] = tk.NORMAL
-        self.detailsButton['state'] = tk.NORMAL
-        if self.currentStep == len(self.solution[0]) - 1:
-            self.nextButton['state'] = tk.DISABLED
-
-    def updateGridDisplay(self):
-        # solution = [path, pathDirections]
+    def update_grid_display(self):
+        # solution = [path, path_directions]
         if self.solution:
-            currentState = str(self.solution[0][self.currentStep])
-            nextStep = self.solution[1][self.currentStep]
-            if nextStep != "Goal State Reached!":
-                nextStep = "Next Step is: " + nextStep
+            current_state = str(self.solution[0][self.current_step])
+            next_step = self.solution[1][self.current_step]
+            if next_step != "Goal State Reached!":
+                next_step = "Next Step is: " + next_step
 
-            self.stateLabel.config(text=nextStep)
-            if len(currentState) < 9:
-                currentState = '0' + currentState
-            currentState = [currentState[i:i + 3] for i in range(0, 9, 3)]
+            self.state_label.config(text=next_step)
+            if len(current_state) < 9:
+                current_state = '0' + current_state
+            current_state = [current_state[i:i + 3] for i in range(0, 9, 3)]
             for row in range(3):
                 for col in range(3):
-                    value = currentState[row][col]
+                    value = current_state[row][col]
                     if value == '0':
-                        self.gridCells[row][col].config(text="", bg='lightBlue')
+                        self.grid_cells[row][col].config(text="", bg='lightBlue')
                     else:
-                        self.gridCells[row][col].config(text=str(value), bg='white')
+                        self.grid_cells[row][col].config(text=str(value), bg='white')
 
-    def nextStep(self):
-        if self.currentStep < len(self.solution[0]) - 1:
-            self.currentStep += 1
-            self.updateGridDisplay()
-            self.prevButton['state'] = tk.NORMAL
-        if self.currentStep == len(self.solution[0]) - 1:
-            self.nextButton['state'] = tk.DISABLED
+    def next_step(self):
+        if self.current_step < len(self.solution[0]) - 1:
+            self.current_step += 1
+            self.update_grid_display()
+            self.prev_button['state'] = tk.NORMAL
+        if self.current_step == len(self.solution[0]) - 1:
+            self.next_button['state'] = tk.DISABLED
 
-    def prevStep(self):
-        if self.currentStep > 0:
-            self.currentStep -= 1
-            self.updateGridDisplay()
-            self.nextButton['state'] = tk.NORMAL
-        if self.currentStep == 0:
-            self.prevButton['state'] = tk.DISABLED
+    def prev_step(self):
+        if self.current_step > 0:
+            self.current_step -= 1
+            self.update_grid_display()
+            self.next_button['state'] = tk.NORMAL
+        if self.current_step == 0:
+            self.prev_button['state'] = tk.DISABLED
 
-    def showDetails(self):
+    def show_details(self):
         if self.details:
             details = "\n".join([f"{key}: {value}" for key, value in self.details.items()])
             messagebox.showinfo("Solution Details", details)
         else:
             messagebox.showinfo("Solution Details", "No solution available.")
+
+    def check_solvable(self, puzzle):
+        inv_count = 0
+        puzzle = str(puzzle)
+        for i in range(len(puzzle)):
+            if puzzle[i] == '0':
+                continue
+            for j in range(i + 1, len(puzzle)):
+                if puzzle[j] and puzzle[i] and puzzle[i] > puzzle[j] != '0':
+                    inv_count += 1
+        return inv_count % 2 == 0
+
+    def show_goal(self):
+        self.current_step = len(self.solution[0]) - 1
+        self.update_grid_display()
+        self.next_button['state'] = tk.DISABLED
+        self.prev_button['state'] = tk.NORMAL
 
 
 # Running the application

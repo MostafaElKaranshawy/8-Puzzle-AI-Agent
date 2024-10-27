@@ -8,6 +8,7 @@ import time
 import tkinter as tk
 from tkinter import ttk, messagebox
 
+
 # Methods handler
 def solve_8Puzzle(method, initial_state):
     if method == "BFS":
@@ -57,6 +58,7 @@ def solve_8Puzzle(method, initial_state):
         return [path, path_directions], details
     else:
         return None, None
+
 
 # Game GUI runner class
 class PuzzleApp:
@@ -219,6 +221,7 @@ class PuzzleApp:
             return
         if not self.check_solvable(initial_state):
             messagebox.showerror("Error", "Puzzle is not solvable!")
+            self.show_game_button['state'] = tk.NORMAL
             return
         method = self.method_var.get()
         if method is None:

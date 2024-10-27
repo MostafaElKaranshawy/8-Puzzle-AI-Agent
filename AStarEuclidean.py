@@ -19,7 +19,9 @@ class AStarEuclidean:
 
 
     def a_star_euclidean(self):
-        self.pq.put( (self.compute_cost_function(self.start_board, 0), (self.start_board, 0) ))
+        cost_function = self.compute_cost_function(self.start_board, 0)
+        self.pq.put( (cost_function, (self.start_board, 0)) )
+        self.frontier_map[self.start_board] = cost_function
         while not self.pq.empty():
             current_state = self.pq.get()[1]  # get the state with the lowest cost from priority, state
             current_board = current_state[0]
@@ -33,13 +35,14 @@ class AStarEuclidean:
 
             self.visited.add(current_board)
             children_boards = self.get_all_children(current_board)
-            # children_boards.sort()
 
             for child_board in children_boards:
-                if ( (child_board not in self.visited and child_board not in self.frontier_map) or
-                    (child_board in self.frontier_map and self.frontier_map[child_board] > current_depth + 1) ):
-                    self.pq.put( (self.compute_cost_function(child_board, current_depth + 1), (child_board, current_depth + 1)) )
-                    self.frontier_map[child_board] = current_depth + 1
+                if child_board in self.visited:
+                    continue
+                cost_function = self.compute_cost_function(child_board, current_depth + 1)
+                if child_board not in self.frontier_map or self.frontier_map[child_board] > cost_function:
+                    self.pq.put( (cost_function, (child_board, current_depth + 1)) )
+                    self.frontier_map[child_board] = cost_function
                     self.parent_map[child_board] = current_board
 
         return False
@@ -51,7 +54,7 @@ class AStarEuclidean:
         return self.get_euclidean_distance(board) + depth
 
 
-    # compute the euclidean distance of the board
+    # compute the Euclidean distance of the board
     def get_euclidean_distance(self, board):
         str_board = str(board)
         if len(str_board) < 9:

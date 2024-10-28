@@ -17,6 +17,9 @@ class AStarManhattan:
         self.frontier_map = {}
 
 
+    # A* using manhattan distance can keep using if visited continue check
+    # because the cost function is g(n) + h(n) and the cost function is always increasing (monotonicity/consistency)
+    # h(n) <= h(n') + c(n, n') where c(n, n') is the cost of moving from n to n'
     def a_star_manhattan(self):
         cost_function = self.compute_cost_function(self.start_board, 0)
         self.pq.put( (cost_function, (self.start_board, 0)) )
@@ -29,17 +32,17 @@ class AStarManhattan:
             if current_board == self.goal_board:
                 return True
 
-            if current_board in self.visited:
-                continue
+            # if current_board in self.visited:
+            #     continue
 
             self.visited.add(current_board)
             children_boards = self.get_all_children(current_board)
 
             for child_board in children_boards:
-                if child_board in self.visited:
-                    continue
+                # if child_board in self.visited:
+                #     continue
                 cost_function = self.compute_cost_function(child_board, current_depth + 1)
-                if child_board not in self.frontier_map or self.frontier_map[child_board] > cost_function:
+                if ( child_board not in self.frontier_map and child_board not in self.visited ) or self.frontier_map[child_board] > cost_function:
                     self.pq.put( (cost_function, (child_board, current_depth + 1)) )
                     self.frontier_map[child_board] = cost_function
                     self.parent_map[child_board] = current_board

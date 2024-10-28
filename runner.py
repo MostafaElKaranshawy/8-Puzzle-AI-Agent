@@ -181,16 +181,10 @@ class PuzzleApp:
 
     # Display the initial state of the puzzle
     def show_game(self):
+        self.reset_game()
         initial_state = self.parse_initial_state()
         if not initial_state:
             return
-        self.solution = []
-        self.details = []
-        self.current_step = -1
-        self.prev_button['state'] = tk.DISABLED
-        self.next_button['state'] = tk.DISABLED
-        self.goal_button['state'] = tk.DISABLED
-        self.details_button['state'] = tk.DISABLED
 
         initial_state = str(initial_state)
         if len(initial_state) < 9:
@@ -205,8 +199,7 @@ class PuzzleApp:
                 else:
                     self.grid_cells[row][col].config(text=str(value), bg='white')
 
-    # Handle the solving process, reset previous solutions and details
-    def handle_solving(self):
+    def reset_game(self):
         self.solution = []
         self.details = []
         self.current_step = -1
@@ -214,15 +207,23 @@ class PuzzleApp:
         self.next_button['state'] = tk.DISABLED
         self.goal_button['state'] = tk.DISABLED
         self.details_button['state'] = tk.DISABLED
+        for row in range(3):
+            for col in range(3):
+                self.grid_cells[row][col].config(text="", bg='white')
+
+    # Handle the solving process, reset previous solutions and details
+    def handle_solving(self):
+        self.reset_game()
         self.show_game_button['state'] = tk.DISABLED
-        self.show_game()
         initial_state = self.parse_initial_state()
         if not initial_state:
+            self.show_game_button['state'] = tk.NORMAL
             return
         if not self.check_solvable(initial_state):
             messagebox.showerror("Error", "Puzzle is not solvable!")
             self.show_game_button['state'] = tk.NORMAL
             return
+        self.show_game()
         method = self.method_var.get()
         if method is None:
             messagebox.showerror("Error", "You should select a method first!")
